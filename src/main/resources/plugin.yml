@@ -1,0 +1,6 @@
+name: BlueMoon
+version: '${version}'
+
+main: de.heimbrodt.sten.blueMoon.BlueMoon
+api-version: '26.2'
+load: POSTWORLD
