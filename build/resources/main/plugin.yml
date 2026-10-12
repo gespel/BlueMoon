@@ -8,3 +8,6 @@ commands:
   home:
     description: Teleportiert dich nach Hause
     usage: /home
+  spellcast:
+    description: Cast a spell
+    usage: /spellcast <SPELLNAME>
