@@ -11,3 +11,6 @@ commands:
   spellcast:
     description: Cast a spell
     usage: /spellcast <SPELLNAME>
+  mana:
+    description: Shows current mana
+    usage: /mana

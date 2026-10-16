@@ -7,17 +7,39 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public final class BlueMoon extends JavaPlugin implements CommandExecutor {
+import java.util.HashSet;
+import java.util.Set;
+
+public final class BlueMoon extends JavaPlugin implements CommandExecutor, Listener {
+    HashSet<BlueMoonPlayer> bluemoon_players;
 
     @Override
     public void onEnable() {
+        bluemoon_players = new HashSet<BlueMoonPlayer>();
         getCommand("home").setExecutor(this);
+        getCommand("spellcast").setExecutor(this);
+        getCommand("mana").setExecutor(this);
+        getServer().getPluginManager().registerEvents(this, this);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (BlueMoonPlayer bp : bluemoon_players) {
+                    bp.tickMana();
+                }
+            }
+        }.runTaskTimer(this, 0L, 20L);
     }
 
     @Override
@@ -25,9 +47,40 @@ public final class BlueMoon extends JavaPlugin implements CommandExecutor {
         // Plugin shutdown logic
     }
 
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player p = event.getPlayer();
+        BlueMoonPlayer bp = new BlueMoonPlayer(p);
+        bluemoon_players.add(bp);
+        getLogger().info("Player " + p.getName() + " joined as a Mage!");
+    }
+
+    @EventHandler
+    public void onPlayerDisconnect(PlayerQuitEvent event) {
+        Player p = event.getPlayer();
+
+        for (BlueMoonPlayer bp : bluemoon_players) {
+            if (bp.getPlayer() == p) {
+                bluemoon_players.remove(bp);
+                getLogger().info("Player " + p.getName() + " left.");
+                break;
+            }
+        }
+    }
+
+    BlueMoonPlayer getBlueMoonPlayerByPlayer(Player p) {
+        for (BlueMoonPlayer bp : this.bluemoon_players) {
+            if (bp.getPlayer() == p) {
+                return bp;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         Player p = (Player) sender;
+        BlueMoonPlayer bp = getBlueMoonPlayerByPlayer(p);
 
         if (cmd.getName().equalsIgnoreCase("home")) {
             p.sendMessage("Teleporting you home now...");
@@ -38,20 +91,14 @@ public final class BlueMoon extends JavaPlugin implements CommandExecutor {
                 p.sendMessage("No spell name provided!");
             }
             else {
-                if (args[0].equalsIgnoreCase("reparus")) {
-                    PlayerInventory pi = p.getInventory();
-                    ItemStack mainHandItem = pi.getItemInMainHand();
-                    ItemMeta mainHandMeta = mainHandItem.getItemMeta();
-                    if (mainHandMeta instanceof Damageable damageable) {
-                        damageable.setDamage(0);
-                        mainHandItem.setItemMeta(mainHandMeta);
-                        p.getInventory().setItemInMainHand(mainHandItem);
-                        p.sendMessage(ChatColor.DARK_PURPLE + "You cast the spell " + ChatColor.GOLD + "Reparus" + ChatColor.RESET);
-                    }
-                }
+                assert bp != null;
+                bp.cast(args[0]);
             }
         }
-
+        else if(cmd.getName().equalsIgnoreCase("mana")) {
+            assert bp != null;
+            p.sendMessage(ChatColor.BLUE + "" + bp.getMana());
+        }
         return true;
     }
 }
