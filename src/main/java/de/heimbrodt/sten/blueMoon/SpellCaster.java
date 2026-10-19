@@ -26,6 +26,8 @@ public class SpellCaster {
                     bp.getPlayer().getInventory().setItemInMainHand(mainHandItem);
                     bp.getPlayer().sendMessage(ChatColor.DARK_PURPLE + "You cast the spell " + ChatColor.GOLD + "Reparus" + ChatColor.RESET);
                     bp.drainMana(60.0F);
+
+                    SpellEffects.ring(bp.getPlayer());
                     return true;
                 }
             }
