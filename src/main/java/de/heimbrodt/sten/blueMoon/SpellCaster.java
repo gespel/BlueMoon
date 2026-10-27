@@ -44,8 +44,8 @@ public class SpellCaster {
                 Block center = p.getLocation().getBlock();
                 ItemStack tool = p.getInventory().getItemInMainHand();
 
-                for (int dx = -2; dx <= 2; dx++) {
-                    for (int dz = -2; dz <= 2; dz++) {
+                for (int dx = -4; dx <= 4; dx++) {
+                    for (int dz = -4; dz <= 4; dz++) {
                         for (int dy = -1; dy <= 1; dy++) {
                             Block b = center.getRelative(dx, dy, dz);
                             if (b.getType() != Material.WHEAT) {
@@ -55,6 +55,7 @@ public class SpellCaster {
                             if (age.getAge() < age.getMaximumAge()) continue;
 
                             b.breakNaturally(tool);
+                            
                         }
                     }
                 }
