@@ -14,3 +14,9 @@ commands:
   mana:
     description: Shows current mana
     usage: /mana
+  bibliothekar:
+    description: spawnt einen bibliothekar
+    usage: /bibliothekar
+  linasdorf:
+    description: teleportiert dich zu Linas Dorf
+    usage: /linasdorf

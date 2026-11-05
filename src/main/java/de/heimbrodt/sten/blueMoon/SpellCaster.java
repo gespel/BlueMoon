@@ -55,7 +55,7 @@ public class SpellCaster {
                             if (age.getAge() < age.getMaximumAge()) continue;
 
                             b.breakNaturally(tool);
-                            
+
                         }
                     }
                 }
