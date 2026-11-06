@@ -115,9 +115,9 @@ public final class BlueMoon extends JavaPlugin implements CommandExecutor, Liste
             v.setCustomName("§eBibliothekar");
             v.setCustomNameVisible(true);
             v.setProfession(Villager.Profession.LIBRARIAN);
-            v.setAI(true);
+            v.setAI(false);
             v.setInvulnerable(false);
-            v.setSilent(true);
+            v.setSilent(false);
             v.setPersistent(true);
             v.setRemoveWhenFarAway(false);
 
@@ -164,12 +164,16 @@ public final class BlueMoon extends JavaPlugin implements CommandExecutor, Liste
         Player p = event.getPlayer();
         String msg = PlainTextComponentSerializer.plainText().serialize(event.message());
 
-        if (msg.contains("Bibliothekar") || msg.contains("bücher") || msg.contains("Buch")) {
-            LLMRequester llmr = new LLMRequester();
-            llmr.talkToPlayer(getBlueMoonPlayerByPlayer(p), null, msg).thenAccept(text -> Bukkit.getScheduler().runTask(this, () -> p.sendMessage("§a[Bibliothekar] §f" + text)));
+        for (BlueMoonVillager bv : this.bluemoon_villagers) {
+            if (bv.getVillager().getLocation().distance(p.getLocation()) < 10) {
+                LLMRequester llmr = new LLMRequester();
+                llmr.talkToPlayer(getBlueMoonPlayerByPlayer(p), bv, msg).thenAccept(text -> Bukkit.getScheduler().runTask(this, () -> {
+                    p.sendMessage("§a[Bibliothekar] §f" + text);
+                    bv.addMemory(p.getName(), msg, text);
+                }));
+                event.setCancelled(true);
+            }
         }
-
-
     }
 
     @EventHandler

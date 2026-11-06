@@ -22,7 +22,9 @@ public class LLMRequester {
         String body = new Gson().toJson(Map.of(
                 "messages", List.of(
                         Map.of("role", "system", "content", bv.getBackstory()),
-                        Map.of("role", "user", "content", bp.getPlayer().getName() + ": " + userText)),
+                        Map.of("role", "user", "content",
+                                (bv.getMemories().isEmpty() ? "" : "=== Vergangene Gespräche ===\n" + bv.getMemories() + "\n") +
+                                "=== Aktuelle Nachricht ===\n" + bp.getPlayer().getName() + ": " + userText)),
                 "chat_template_kwargs", Map.of("enable_thinking", false),
                 "max_tokens", 80, "temperature", 1.0));
 
